@@ -54,6 +54,93 @@ typename BST<K, V>::Node * BST<K, V>::Find(K key) {
 }
 
 template <typename K, typename V>
+bool BST<K, V>::Remove(K key) {
+	if (!root) {
+		return NULL;
+	}
+	
+	Node ** slot = &root;
+	Node * child = root;
+	int cmp_result;
+	do {
+		//parent = child;
+		cmp_result = compare_func(key, child->GetKey());
+		
+		if (cmp_result == 0) {
+			break;
+		}
+		
+		if (cmp_result < 0) {
+			slot = &child->left;
+			child = child->left;
+		}
+		else {
+			slot = &child->right;
+			child = child->right;
+		}
+	}
+	while (child);
+	
+	if (!child) {
+		return false;
+	}
+	Node * to_remove = child;
+	
+	if (to_remove->left && to_remove->right) {
+		if (to_remove->left->right) {
+			// Find maximum node on left side of tree
+			Node * max_node = to_remove->left->right;
+			Node * max_parent = to_remove->left;
+			while (max_node->right) {
+				max_parent = max_node;
+				max_node = max_node->right;
+			}
+			max_parent->right = NULL;
+			
+			// If the maximum node has a lesser child, append to max_parent
+			if (max_node->left) {
+				max_parent->right = max_node->left;
+			}
+			
+			*slot = max_node;
+			max_node->left = to_remove->left;
+			max_node->right = to_remove->right;
+			delete to_remove;
+			n_nodes -= 1;
+			return true;
+		}
+		else {
+			// Shift left node up
+			*slot = to_remove->left;
+			delete to_remove;
+			n_nodes -= 1;
+			return true;
+		}
+	}
+	else if (to_remove->left && !to_remove->right) {
+		// Promote left node to slot
+		*slot = to_remove->left;
+		delete to_remove;
+		n_nodes -= 1;
+		return true;
+	}
+	else if (!to_remove->left && to_remove->right) {
+		// Promote right node to slot
+		*slot = to_remove->right;
+		delete to_remove;
+		n_nodes -= 1;
+		return true;
+	}
+	else {
+		// Root is only node in tree
+		*slot = NULL;
+		delete to_remove;
+		n_nodes -= 1;
+		return true;
+	}
+}
+
+template <typename K, typename V>
 typename BST<K, V>::Node * BST<K, V>::First() {
 	if (!root) {
 		return NULL;

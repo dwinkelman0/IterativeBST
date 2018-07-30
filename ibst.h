@@ -27,7 +27,7 @@ public:
 		}
 	};
 	
-public:
+protected:
 	Node * root = NULL;
 	unsigned int n_nodes = 0;
 	unsigned int max_depth = 0;
@@ -40,7 +40,7 @@ public:
 
 	Node * Insert(K key, V value);
 	Node * Find(K key);
-	Node * Remove(K key);
+	bool Remove(K key);
 	
 	Node * First();
 	Node * Last();
